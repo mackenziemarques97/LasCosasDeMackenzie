@@ -1,0 +1,1221 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>BME302_Lab3_Tensile</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-02-21"><meta name="DC.source" content="BME302_Lab3_Tensile.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Load Data</a></li><li><a href="#3">Mean + SD of measurement values</a></li><li><a href="#4">Stress Strain Plots</a></li><li><a href="#5">file 1 - remove fracture region, find 1st &amp; 2nd derivative</a></li><li><a href="#6">file 2 - 1st &amp; 2nd derivative</a></li><li><a href="#7">file 3 - remove fracture region, find 1st &amp; 2nd derivative</a></li><li><a href="#8">file 4 - remove fracture region, find 1st &amp; 2nd derivative</a></li><li><a href="#9">file 5 - 1st &amp; 2nd derivative</a></li></ul></div><pre class="codeinput"><span class="comment">%BME 302, Lab 3, Tissue Testing - TENSILE (excluding rattailcollagen)</span>
+<span class="comment">%Mackenzie Marques</span>
+
+clear <span class="string">all</span>
+close <span class="string">all</span>
+</pre><h2 id="2">Load Data</h2><pre class="codeinput">source_dirTens = <span class="string">'C:\Users\Mackenzie\Documents\MATLAB\BME302_Lab\LAB3\Tension'</span>;
+TensFile = dir(fullfile(source_dirTens,<span class="string">'*.xlsx'</span>));
+<span class="keyword">for</span> j = 1:5
+    [num,txt,raw] = xlsread(TensFile(j).name);
+    name = extractBefore(TensFile(j).name, <span class="string">'.xlsx'</span>);
+    name = strrep(name,<span class="string">'1'</span>,<span class="string">''</span>);
+numtrials = numel(num(1,:))/2;
+SET = struct(<span class="string">'Material'</span>, {},<span class="keyword">...</span>
+    <span class="string">'GageLength'</span>, {},<span class="keyword">...</span>
+    <span class="string">'Thickness'</span>, {},<span class="keyword">...</span>
+    <span class="string">'Width'</span>, {},<span class="keyword">...</span>
+    <span class="string">'Area'</span>, {},<span class="keyword">...</span>
+    <span class="string">'Position'</span>, {},<span class="keyword">...</span>
+    <span class="string">'Load'</span>, {},<span class="keyword">...</span>
+    <span class="string">'Stress'</span>, {},<span class="keyword">...</span>
+    <span class="string">'Strain'</span>, {});
+<span class="keyword">for</span> k = 1:numtrials
+    i = 2*k-1;
+    s.Material = name;
+    s.GageLength = num(1,i+1);
+    s.Thickness = num(2,i+1);
+    s.Width = num(3,i+1);
+    s.Area = num(4,i+1);
+    s.Position = num(8:end,i);
+    s.Load = num(8:end,i+1);
+    s.Position(isnan(s.Position)) = [];
+    s.Load(isnan(s.Load)) = [];
+    s.Stress = (s.Load)./(s.Area);
+    s.Strain = (s.Position)./(s.GageLength);
+    SET(k) = s;
+<span class="keyword">end</span>
+Tensile.(sprintf(<span class="string">'file%d'</span>, j))=SET;
+<span class="keyword">end</span>
+</pre><h2 id="3">Mean + SD of measurement values</h2><pre class="codeinput">clear <span class="string">h</span> <span class="string">m</span>
+MeanSD_tens = struct(<span class="string">'GageLengthMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'ThicknessMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'WidthMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'AreaMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'GageLengthSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'ThicknessSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'WidthSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'AreaSD'</span>,{});
+<span class="keyword">for</span> h = 1:5
+    m.GageLengthMean = mean([Tensile.(sprintf(<span class="string">'file%d'</span>, h)).GageLength]);
+    m.ThicknessMean = mean([Tensile.(sprintf(<span class="string">'file%d'</span>, h)).Thickness]);
+    m.WidthMean = mean([Tensile.(sprintf(<span class="string">'file%d'</span>, h)).Width]);
+    m.AreaMean = mean([Tensile.(sprintf(<span class="string">'file%d'</span>, h)).Area]);
+    m.GageLengthSD = std([Tensile.(sprintf(<span class="string">'file%d'</span>, h)).GageLength]);
+    m.ThicknessSD = std([Tensile.(sprintf(<span class="string">'file%d'</span>, h)).Thickness]);
+    m.WidthSD = std([Tensile.(sprintf(<span class="string">'file%d'</span>, h)).Width]);
+    m.AreaSD = std([Tensile.(sprintf(<span class="string">'file%d'</span>, h)).Area]);
+    MeanSD_tens(h) = m;
+<span class="keyword">end</span>
+</pre><h2 id="4">Stress Strain Plots</h2><h2 id="5">file 1 - remove fracture region, find 1st &amp; 2nd derivative</h2><pre class="codeinput">        clf(figure(1))
+        figure(1)
+        <span class="keyword">for</span> d = 1:numel(Tensile.file1)
+        StressNew = downsample(Tensile.file1(d).Stress, 3);
+        StrainNew = downsample(Tensile.file1(d).Strain, 3);
+        [Tensile.file1(d).StressNew] = StressNew;
+        [Tensile.file1(d).StrainNew] = StrainNew;
+        <span class="comment">%[~ , Locs] = findpeaks(Tensile.file1(d).StressNew);</span>
+        <span class="comment">%if length(Tensile.file1(d).StrainNew) &gt;= Locs(end)</span>
+            <span class="comment">%Tensile.file1(d).StrainNew(Locs(end):end) = [];</span>
+            <span class="comment">%Tensile.file1(d).StressNew(Locs(end):end) = [];</span>
+        <span class="comment">%end</span>
+        <span class="keyword">for</span> f = numel(Tensile.file1):1
+            X = find(Tensile.file1(f).diff &lt;= -50);
+            Tensile.file1(f).StressNew(X) = [];
+            Tensile.file1(f).StrainNew(X) = [];
+        <span class="keyword">end</span>
+        Tensile.file1(d).StressNew = smooth((Tensile.file1(d).StrainNew), (Tensile.file1(d).StressNew),0.1, <span class="string">'loess'</span>);
+        <span class="comment">%[~ , Locs1] = findpeaks(Tensile.file1(d).StressNew);</span>
+        <span class="comment">%if length(Tensile.file1(d).StrainNew) &gt;= Locs1(end)</span>
+            <span class="comment">%Tensile.file1(d).StrainNew(Locs1(end):end) = [];</span>
+            <span class="comment">%Tensile.file1(d).StressNew(Locs1(end):end) = [];</span>
+        <span class="comment">%end</span>
+        <span class="comment">%[Tensile.file1(d).StrainNew, Tensile.file1(d).StressNew] = ...</span>
+        <span class="comment">%smoothing((Tensile.file1(d).StrainNew), (Tensile.file1(d).StressNew));</span>
+        [Tensile.file1(d).diff] = diff(Tensile.file1(d).StressNew)./<span class="keyword">...</span>
+            diff(Tensile.file1(d).StrainNew);
+        [Tensile.file1(d).diff2] = diff(Tensile.file1(d).diff)./<span class="keyword">...</span>
+            diff(Tensile.file1(d).StrainNew(2:end));
+        <span class="comment">%subplot(2,2,1)</span>
+        hold <span class="string">on</span>
+        plot(Tensile.file1(d).Strain, Tensile.file1(d).Stress);
+        xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        title([<span class="string">'Noisy Stress vs. Strain '</span>, Tensile.file1(d).Material])
+        hold <span class="string">off</span>
+        <span class="comment">%subplot(2,2,2)</span>
+        hold <span class="string">on</span>
+        <span class="comment">%plot(Tensile.file1(d).StrainNew, Tensile.file1(d).StressNew);</span>
+        xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        <span class="comment">%title(['Cleaned Stress vs. Strain ', Tensile.file1(d).Material])</span>
+        hold <span class="string">off</span>
+        <span class="keyword">end</span>
+clear <span class="string">d</span> <span class="string">c</span> <span class="string">f</span>
+P = zeros(1,18);
+E = zeros(1,9);
+YieldStress = zeros(1,9);
+    <span class="keyword">for</span> d = 1:numel(Tensile.file1)
+        keepgoing = true;
+        f = 1;
+        Window = 1;
+        <span class="keyword">while</span> (f+Window &lt; numel(Tensile.file1(d).StrainNew)) &amp;&amp; keepgoing
+            R = corr(Tensile.file1(d).StrainNew(f:f+Window),<span class="keyword">...</span>
+                Tensile.file1(d).StressNew(f:f+Window));
+            <span class="keyword">if</span> R &gt; 0.97
+                keepgoing = true;
+                f = f+Window;
+            <span class="keyword">else</span>
+                keepgoing = false;
+                X = Tensile.file1(d).StrainNew(1:f+Window);
+                Y = Tensile.file1(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file1(d).StressNew(f+Window);
+                <span class="keyword">for</span> c = 2*d-1
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+   [Tensile.file1(d).E] = E(d);
+   [Tensile.file1(d).YS] = YieldStress(d);
+   [Tensile.file1(d).UStress] = max(Tensile.file1(d).StressNew);
+   R = find(Tensile.file1(d).StressNew == max(Tensile.file1(d).StressNew));
+   [Tensile.file1(d).UStrain] = Tensile.file1(d).StrainNew(R);
+    <span class="keyword">end</span>
+H = find(E == 0);
+<span class="keyword">for</span> d = H
+   YieldStress(d) = Tensile.file1(d).StressNew(end);
+   <span class="keyword">for</span> c = 2*d-1
+   P(c:c+1) = polyfit(Tensile.file1(d).StrainNew, Tensile.file1(d)<span class="keyword">...</span>
+       .StressNew, 1);
+   E(d) = P(c);
+   <span class="keyword">end</span>
+   [Tensile.file1(d).E] = E(d);
+   [Tensile.file1(d).YS] = YieldStress(d);
+   [Tensile.file1(d).UStress] = max(Tensile.file1(d).StressNew);
+   R = find(Tensile.file1(d).StressNew == max(Tensile.file1(d).StressNew));
+   [Tensile.file1(d).UStrain] = Tensile.file1(d).StrainNew(R);
+<span class="keyword">end</span>
+<span class="comment">% Mean &amp; SD - mech props</span>
+props_MeanSD_tens1 = struct(<span class="string">'EMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'ESD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressSD'</span>, {});
+    n.EMean = mean([Tensile.file1.E]);
+    n.YSMean = mean([Tensile.file1.YS]);
+    n.UStrainMean = mean([Tensile.file1.UStrain]);
+    n.UStressMean = mean([Tensile.file1.UStress]);
+    n.ESD = std([Tensile.file1.E]);
+    n.YSSD = std([Tensile.file1.YS]);
+    n.UStrainSD = std([Tensile.file1.UStrain]);
+    n.UStressSD = std([Tensile.file1.UStress]);
+    props_MeanSD_tens1 = n;
+</pre><img vspace="5" hspace="5" src="BME302_Lab3_Tensile_01.png" alt=""> <h2 id="6">file 2 - 1st &amp; 2nd derivative</h2><pre class="codeinput">        clf(figure(2))
+        figure(2)
+        <span class="keyword">for</span> d = 1:numel(Tensile.file2)
+        StressNew = downsample(Tensile.file2(d).Stress, 5);
+        StrainNew = downsample(Tensile.file2(d).Strain, 5);
+        [Tensile.file2(d).StressNew] = StressNew;
+        [Tensile.file2(d).StrainNew] = StrainNew;
+        [Pks, Locs] = findpeaks(Tensile.file2(d).StressNew);
+        <span class="keyword">if</span> length(Tensile.file2(d).StrainNew) &gt;= Locs(end)
+            Tensile.file2(d).StrainNew(Locs(end):end) = [];
+            Tensile.file2(d).StressNew(Locs(end):end) = [];
+        <span class="keyword">end</span>
+        <span class="comment">%X = max(Tensile.file1(d).StressNew);</span>
+        <span class="comment">%Y = find(Tensile.file1(d).StressNew == X);</span>
+        <span class="comment">%[Tensile.file1(d).StressNew] = Tensile.file1(d).StressNew(1:Y);</span>
+        <span class="comment">%[Tensile.file1(d).StrainNew] = Tensile.file1(d).StrainNew(1:Y);</span>
+        Tensile.file2(d).StressNew = smooth((Tensile.file2(d).StrainNew),<span class="keyword">...</span>
+            (Tensile.file2(d).StressNew),0.1, <span class="string">'loess'</span>);
+        [Tensile.file2(d).diff] = diff(Tensile.file2(d).StressNew)./<span class="keyword">...</span>
+            diff(Tensile.file2(d).StrainNew);
+        [Tensile.file2(d).diff2] = diff(Tensile.file2(d).diff)./<span class="keyword">...</span>
+            diff(Tensile.file2(d).StrainNew(2:end));
+        <span class="comment">%subplot(2,2,1)</span>
+        hold <span class="string">on</span>
+        plot(Tensile.file2(d).Strain, Tensile.file2(d).Stress);
+        xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        title([<span class="string">'Noisy Stress vs. Strain '</span>, Tensile.file2(d).Material])
+        hold <span class="string">off</span>
+        <span class="comment">%subplot(2,2,2)</span>
+        hold <span class="string">on</span>
+        <span class="comment">%plot(Tensile.file2(d).StrainNew, Tensile.file2(d).StressNew);</span>
+        xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        <span class="keyword">end</span>
+clear <span class="string">d</span> <span class="string">c</span> <span class="string">f</span>
+P = zeros(1,16);
+E = zeros(1,8);
+YieldStress = zeros(1,8);
+    <span class="keyword">for</span> d = 1:numel(Tensile.file2)
+        keepgoing = true;
+        f = 1;
+        Window = 1;
+        <span class="keyword">while</span> (f+Window &lt; numel(Tensile.file2(d).StrainNew)) &amp;&amp; keepgoing
+            R = corr(Tensile.file2(d).StrainNew(f:f+Window),<span class="keyword">...</span>
+                Tensile.file2(d).StressNew(f:f+Window));
+            <span class="keyword">if</span> R &gt; 0.97
+                keepgoing = true;
+                f = f+Window;
+            <span class="keyword">else</span>
+                keepgoing = false;
+                X = Tensile.file2(d).StrainNew(1:f+Window);
+                Y = Tensile.file2(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file2(d).StressNew(f+Window);
+                <span class="keyword">for</span> c = 2*d-1
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+   [Tensile.file2(d).E] = E(d);
+   [Tensile.file2(d).YS] = YieldStress(d);
+   [Tensile.file2(d).UStress] = max(Tensile.file2(d).StressNew);
+   R = find(Tensile.file2(d).StressNew == max(Tensile.file2(d).StressNew));
+   [Tensile.file2(d).UStrain] = Tensile.file2(d).StrainNew(R);
+    <span class="keyword">end</span>
+H = find(E == 0);
+<span class="keyword">for</span> d = H
+   YieldStress(d) = Tensile.file2(d).StressNew(end);
+   <span class="keyword">for</span> c = 2*d-1
+   P(c:c+1) = polyfit(Tensile.file2(d).StrainNew, Tensile.file2(d)<span class="keyword">...</span>
+       .StressNew, 1);
+   E(d) = P(c);
+   <span class="keyword">end</span>
+   [Tensile.file2(d).E] = E(d);
+   [Tensile.file2(d).YS] = YieldStress(d);
+   [Tensile.file2(d).UStress] = max(Tensile.file2(d).StressNew);
+   R = find(Tensile.file2(d).StressNew == max(Tensile.file2(d).StressNew));
+   [Tensile.file2(d).UStrain] = Tensile.file2(d).StrainNew(R);
+<span class="keyword">end</span>
+<span class="comment">% Mean &amp; SD - mech props</span>
+props_MeanSD_tens2 = struct(<span class="string">'EMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'ESD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressSD'</span>, {});
+    n.EMean = mean([Tensile.file2.E]);
+    n.YSMean = mean([Tensile.file2.YS]);
+    n.UStrainMean = mean([Tensile.file2.UStrain]);
+    n.UStressMean = mean([Tensile.file2.UStress]);
+    n.ESD = std([Tensile.file2.E]);
+    n.YSSD = std([Tensile.file2.YS]);
+    n.UStrainSD = std([Tensile.file2.UStrain]);
+    n.UStressSD = std([Tensile.file2.UStress]);
+    props_MeanSD_tens2 = n;
+</pre><img vspace="5" hspace="5" src="BME302_Lab3_Tensile_02.png" alt=""> <h2 id="7">file 3 - remove fracture region, find 1st &amp; 2nd derivative</h2><pre class="codeinput">        clf(figure(3))
+        figure(3)
+        <span class="keyword">for</span> d = 1:numel(Tensile.file3)
+        StressNew = downsample(Tensile.file3(d).Stress, 5);
+        StrainNew = downsample(Tensile.file3(d).Strain, 5);
+        [Tensile.file3(d).StressNew] = StressNew;
+        [Tensile.file3(d).StrainNew] = StrainNew;
+        [Pks, Locs] = findpeaks(Tensile.file3(d).StressNew);
+        <span class="keyword">if</span> length(Tensile.file3(d).StrainNew) &gt;= Locs(end)
+            Tensile.file3(d).StrainNew(Locs(end):end) = [];
+            Tensile.file3(d).StressNew(Locs(end):end) = [];
+        <span class="keyword">end</span>
+        <span class="comment">%X = max(Tensile.file4(d).StressNew);</span>
+        <span class="comment">%Y = find([Tensile.file4(d).StressNew] == X);</span>
+        <span class="comment">%[Tensile.file4(d).StressNew] = Tensile.file4(d).StressNew(1:Y);</span>
+        <span class="comment">%[Tensile.file4(d).StrainNew] = Tensile.file4(d).StrainNew(1:Y);</span>
+        Tensile.file3(d).StressNew = smooth((Tensile.file3(d).StrainNew),<span class="keyword">...</span>
+            (Tensile.file3(d).StressNew),0.1, <span class="string">'loess'</span>);
+        [Tensile.file3(d).diff] = diff(Tensile.file3(d).StressNew)./<span class="keyword">...</span>
+            diff(Tensile.file3(d).StrainNew);
+        [Tensile.file3(d).diff2] = diff(Tensile.file3(d).diff)./<span class="keyword">...</span>
+            diff(Tensile.file3(d).StrainNew(2:end));
+        <span class="comment">%subplot(2,2,1)</span>
+        hold <span class="string">on</span>
+        plot(Tensile.file3(d).Strain, Tensile.file3(d).Stress);
+        xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        title([<span class="string">'Stress vs. Strain '</span>, Tensile.file3(d).Material])
+        hold <span class="string">off</span>
+        <span class="comment">%subplot(2,2,2)</span>
+        hold <span class="string">on</span>
+        <span class="comment">%plot(Tensile.file3(d).StrainNew, Tensile.file3(d).StressNew);</span>
+        xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        hold <span class="string">off</span>
+        <span class="keyword">end</span>
+clear <span class="string">d</span> <span class="string">c</span> <span class="string">f</span>
+P = zeros(1,20);
+E = zeros(1,10);
+YieldStress = zeros(1,10);
+    <span class="keyword">for</span> d = 1:numel(Tensile.file3)
+        keepgoing = true;
+        f = 1;
+        Window = 1;
+        <span class="keyword">while</span> (f+Window &lt; numel(Tensile.file3(d).StrainNew)) &amp;&amp; keepgoing
+            R = corr(Tensile.file3(d).StrainNew(f:f+Window),<span class="keyword">...</span>
+                Tensile.file3(d).StressNew(f:f+Window));
+            <span class="keyword">if</span> R &gt; 0.97
+                keepgoing = true;
+                f = f+Window;
+            <span class="keyword">else</span>
+                keepgoing = false;
+                X = Tensile.file3(d).StrainNew(1:f+Window);
+                Y = Tensile.file3(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file3(d).StressNew(f+Window);
+                <span class="keyword">for</span> c = 2*d-1
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+   [Tensile.file3(d).E] = E(d);
+   [Tensile.file3(d).YS] = YieldStress(d);
+   [Tensile.file3(d).UStress] = max(Tensile.file3(d).StressNew);
+   R = find(Tensile.file3(d).StressNew == max(Tensile.file3(d).StressNew));
+   [Tensile.file3(d).UStrain] = Tensile.file3(d).StrainNew(R);
+    <span class="keyword">end</span>
+H = find(E == 0);
+<span class="keyword">for</span> d = H
+   YieldStress(d) = Tensile.file3(d).StressNew(end);
+   <span class="keyword">for</span> c = 2*d-1
+   P(c:c+1) = polyfit(Tensile.file3(d).StrainNew,<span class="keyword">...</span>
+       Tensile.file3(d).StressNew, 1);
+   E(d) = P(c);
+   <span class="keyword">end</span>
+   [Tensile.file3(d).E] = E(d);
+   [Tensile.file3(d).YS] = YieldStress(d);
+   [Tensile.file3(d).UStress] = max(Tensile.file3(d).StressNew);
+   R = find(Tensile.file3(d).StressNew == max(Tensile.file3(d).StressNew));
+   [Tensile.file3(d).UStrain] = Tensile.file3(d).StrainNew(R);
+<span class="keyword">end</span>
+<span class="comment">% Mean &amp; SD - mech props</span>
+props_MeanSD_tens3 = struct(<span class="string">'EMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'ESD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressSD'</span>, {});
+    n.EMean = mean([Tensile.file3.E]);
+    n.YSMean = mean([Tensile.file3.YS]);
+    n.UStrainMean = mean([Tensile.file3.UStrain]);
+    n.UStressMean = mean([Tensile.file3.UStress]);
+    n.ESD = std([Tensile.file3.E]);
+    n.YSSD = std([Tensile.file3.YS]);
+    n.UStrainSD = std([Tensile.file3.UStrain]);
+    n.UStressSD = std([Tensile.file3.UStress]);
+    props_MeanSD_tens3 = n;
+</pre><img vspace="5" hspace="5" src="BME302_Lab3_Tensile_03.png" alt=""> <h2 id="8">file 4 - remove fracture region, find 1st &amp; 2nd derivative</h2><pre class="codeinput">        clf(figure(4))
+        figure(4)
+        <span class="keyword">for</span> d = 1:numel(Tensile.file4)
+        StressNew = downsample(Tensile.file4(d).Stress, 5);
+        StrainNew = downsample(Tensile.file4(d).Strain, 5);
+        [Tensile.file4(d).StressNew] = StressNew;
+        [Tensile.file4(d).StrainNew] = StrainNew;
+        [Pks, Locs] = findpeaks(Tensile.file4(d).StressNew);
+        <span class="keyword">if</span> length(Tensile.file4(d).StrainNew) &gt;= Locs(end)
+            Tensile.file4(d).StrainNew(Locs(end):end) = [];
+            Tensile.file4(d).StressNew(Locs(end):end) = [];
+        <span class="keyword">end</span>
+        <span class="comment">%X = max(Tensile.file4(d).StressNew);</span>
+        <span class="comment">%Y = find([Tensile.file4(d).StressNew] == X);</span>
+        <span class="comment">%[Tensile.file4(d).StressNew] = Tensile.file4(d).StressNew(1:Y);</span>
+        <span class="comment">%[Tensile.file4(d).StrainNew] = Tensile.file4(d).StrainNew(1:Y);</span>
+        Tensile.file4(d).StressNew = smooth((Tensile.file4(d).StrainNew),<span class="keyword">...</span>
+            (Tensile.file4(d).StressNew),0.1, <span class="string">'loess'</span>);
+        [Tensile.file4(d).diff] = diff(Tensile.file4(d).StressNew)./<span class="keyword">...</span>
+            diff(Tensile.file4(d).StrainNew);
+        [Tensile.file4(d).diff2] = diff(Tensile.file4(d).diff)./<span class="keyword">...</span>
+            diff(Tensile.file4(d).StrainNew(2:end));
+        <span class="comment">%subplot(2,2,1)</span>
+        hold <span class="string">on</span>
+        plot(Tensile.file4(d).Strain, Tensile.file4(d).Stress);
+        xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        title([<span class="string">'Noisy Stress vs. Strain '</span>, Tensile.file4(d).Material])
+        hold <span class="string">off</span>
+        <span class="comment">%subplot(2,2,2)</span>
+        hold <span class="string">on</span>
+        <span class="comment">%plot(Tensile.file4(d).StrainNew, Tensile.file4(d).StressNew);</span>
+        xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        hold <span class="string">off</span>
+        <span class="keyword">end</span>
+clear <span class="string">d</span> <span class="string">c</span> <span class="string">f</span>
+P = zeros(1,20);
+E = zeros(1,10);
+YieldStress = zeros(1,10);
+    <span class="keyword">for</span> d = 1:numel(Tensile.file4)
+        keepgoing = true;
+        f = 1;
+        Window = 1;
+        <span class="keyword">while</span> (f+Window &lt; numel(Tensile.file4(d).StrainNew)) &amp;&amp; keepgoing
+            R = corr(Tensile.file4(d).StrainNew(f:f+Window),<span class="keyword">...</span>
+                Tensile.file4(d).StressNew(f:f+Window));
+            <span class="keyword">if</span> R &gt; 0.97
+                keepgoing = true;
+                f = f+Window;
+            <span class="keyword">else</span>
+                keepgoing = false;
+                X = Tensile.file4(d).StrainNew(1:f+Window);
+                Y = Tensile.file4(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file4(d).StressNew(f+Window);
+                <span class="keyword">for</span> c = 2*d-1
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+   [Tensile.file4(d).E] = E(d);
+   [Tensile.file4(d).YS] = YieldStress(d);
+   [Tensile.file4(d).UStress] = max(Tensile.file4(d).StressNew);
+   R = find(Tensile.file4(d).StressNew == max(Tensile.file4(d).StressNew));
+   [Tensile.file4(d).UStrain] = Tensile.file4(d).StrainNew(R);
+    <span class="keyword">end</span>
+H = find(E == 0);
+<span class="keyword">for</span> d = H
+   YieldStress(d) = Tensile.file4(d).StressNew(end);
+   <span class="keyword">for</span> c = 2*d-1
+   P(c:c+1) = polyfit(Tensile.file4(d).StrainNew,<span class="keyword">...</span>
+       Tensile.file4(d).StressNew, 1);
+   E(d) = P(c);
+   <span class="keyword">end</span>
+   [Tensile.file4(d).E] = E(d);
+   [Tensile.file4(d).YS] = YieldStress(d);
+   [Tensile.file4(d).UStress] = max(Tensile.file4(d).StressNew);
+   R = find(Tensile.file4(d).StressNew == max(Tensile.file4(d).StressNew));
+   [Tensile.file4(d).UStrain] = Tensile.file4(d).StrainNew(R);
+<span class="keyword">end</span>
+<span class="comment">% Mean &amp; SD - mech props</span>
+props_MeanSD_tens4 = struct(<span class="string">'EMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'ESD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressSD'</span>, {});
+    n.EMean = mean([Tensile.file4.E]);
+    n.YSMean = mean([Tensile.file4.YS]);
+    n.UStrainMean = mean([Tensile.file4.UStrain]);
+    n.UStressMean = mean([Tensile.file4.UStress]);
+    n.ESD = std([Tensile.file4.E]);
+    n.YSSD = std([Tensile.file4.YS]);
+    n.UStrainSD = std([Tensile.file4.UStrain]);
+    n.UStressSD = std([Tensile.file4.UStress]);
+    props_MeanSD_tens4 = n;
+</pre><img vspace="5" hspace="5" src="BME302_Lab3_Tensile_04.png" alt=""> <h2 id="9">file 5 - 1st &amp; 2nd derivative</h2><pre class="codeinput">        clf(figure(5))
+        figure(5)
+        <span class="keyword">for</span> d = 1:numel(Tensile.file5)
+        StressNew = downsample(Tensile.file5(d).Stress, 4);
+        StrainNew = downsample(Tensile.file5(d).Strain, 4);
+        [Tensile.file5(d).StressNew] = StressNew;
+        [Tensile.file5(d).StrainNew] = StrainNew;
+        [Pks, Locs] = findpeaks(Tensile.file5(d).StressNew);
+        <span class="keyword">if</span> length(Tensile.file5(d).StrainNew) &gt;= Locs(end)
+            Tensile.file5(d).StrainNew(Locs(end):end) = [];
+            Tensile.file5(d).StressNew(Locs(end):end) = [];
+        <span class="keyword">end</span>
+        <span class="comment">%X = max(Tensile.file4(d).StressNew);</span>
+        <span class="comment">%Y = find([Tensile.file4(d).StressNew] == X);</span>
+        <span class="comment">%[Tensile.file4(d).StressNew] = Tensile.file4(d).StressNew(1:Y);</span>
+        <span class="comment">%[Tensile.file4(d).StrainNew] = Tensile.file4(d).StrainNew(1:Y);</span>
+        Tensile.file5(d).StressNew = smooth((Tensile.file5(d).StrainNew),<span class="keyword">...</span>
+            (Tensile.file5(d).StressNew),0.1, <span class="string">'loess'</span>);
+        [Tensile.file5(d).diff] = diff(Tensile.file5(d).StressNew)./<span class="keyword">...</span>
+            diff(Tensile.file5(d).StrainNew);
+        [Tensile.file5(d).diff2] = diff(Tensile.file5(d).diff)./<span class="keyword">...</span>
+            diff(Tensile.file5(d).StrainNew(2:end));
+        Tensile.file5(d).diff = smooth((Tensile.file5(d)<span class="keyword">...</span><span class="comment">.</span>
+            .StrainNew(2:end)), (Tensile.file5(d).diff),0.1, <span class="string">'loess'</span>);
+        <span class="comment">%subplot(2,2,1)</span>
+        hold <span class="string">on</span>
+        plot(Tensile.file5(d).Strain, Tensile.file5(d).Stress);
+        xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        title([<span class="string">'Noisy Stress vs. Strain '</span>, Tensile.file5(d).Material])
+        hold <span class="string">off</span>
+        <span class="comment">%subplot(2,2,2)</span>
+        hold <span class="string">on</span>
+        <span class="comment">%plot(Tensile.file5(d).StrainNew, Tensile.file5(d).StressNew);</span>
+                xlabel(<span class="string">'Strain (mm/mm)'</span>);
+        ylabel(<span class="string">'Stress (N/{mm}^2)'</span>);
+        hold <span class="string">off</span>
+        <span class="keyword">end</span>
+clear <span class="string">d</span> <span class="string">c</span> <span class="string">f</span>
+P = zeros(1,16);
+E = zeros(1,8);
+YieldStress = zeros(1,8);
+    <span class="keyword">for</span> d = 1:numel(Tensile.file5)
+        keepgoing = true;
+        f = 1;
+        Window = 15;
+        <span class="keyword">if</span> numel(Tensile.file5(d).StressNew) &lt; 1579 &amp;&amp;<span class="keyword">...</span>
+                numel(Tensile.file5(d).StressNew) &gt; 1570
+            Window = 1000;
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> numel(Tensile.file5(d).StressNew) &lt; 2000 &amp;&amp;<span class="keyword">...</span>
+                numel(Tensile.file5(d).StressNew) &gt; 1800
+            Window = 1000;
+        <span class="keyword">end</span>
+        <span class="keyword">while</span> (f+Window &lt; numel(Tensile.file5(d).StrainNew)) &amp;&amp; keepgoing
+            R = corr(Tensile.file5(d).StrainNew(f:f+Window)<span class="keyword">...</span>
+                , Tensile.file5(d).StressNew(f:f+Window));
+            <span class="keyword">if</span> R &gt; 0.94
+                keepgoing = true;
+                f = f+Window;
+            <span class="keyword">else</span>
+                keepgoing = false;
+                X = Tensile.file5(d).StrainNew(1:f+Window);
+                Y = Tensile.file5(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file5(d).StressNew(f+Window);
+                <span class="keyword">for</span> c = 2*d-1
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+   [Tensile.file5(d).E] = E(d);
+   [Tensile.file5(d).YS] = YieldStress(d);
+   [Tensile.file5(d).UStress] = max(Tensile.file5(d).StressNew);
+   R = find(Tensile.file5(d).StressNew == max(Tensile.file5(d).StressNew));
+   [Tensile.file5(d).UStrain] = Tensile.file5(d).StrainNew(R);
+    <span class="keyword">end</span>
+H = find(E == 0);
+<span class="keyword">for</span> d = H
+   YieldStress(d) = Tensile.file5(d).StressNew(end);
+   <span class="keyword">for</span> c = 2*d-1
+   P(c:c+1) = polyfit(Tensile.file5(d).StrainNew,<span class="keyword">...</span>
+       Tensile.file5(d).StressNew, 1);
+   E(d) = P(c);
+   <span class="keyword">end</span>
+   [Tensile.file5(d).E] = E(d);
+   [Tensile.file5(d).YS] = YieldStress(d);
+   [Tensile.file5(d).UStress] = max(Tensile.file5(d).StressNew);
+   R = find(Tensile.file5(d).StressNew == max(Tensile.file5(d).StressNew));
+   [Tensile.file5(d).UStrain] = Tensile.file5(d).StrainNew(R);
+<span class="keyword">end</span>
+<span class="comment">% Mean &amp; SD - mech props</span>
+props_MeanSD_tens5 = struct(<span class="string">'EMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressMean'</span>, {},<span class="keyword">...</span>
+    <span class="string">'ESD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'YSSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStrainSD'</span>, {},<span class="keyword">...</span>
+    <span class="string">'UStressSD'</span>, {});
+    n.EMean = mean([Tensile.file5.E]);
+    n.YSMean = mean([Tensile.file5.YS]);
+    n.UStrainMean = mean([Tensile.file5.UStrain]);
+    n.UStressMean = mean([Tensile.file5.UStress]);
+    n.ESD = std([Tensile.file5.E]);
+    n.YSSD = std([Tensile.file5.YS]);
+    n.UStrainSD = std([Tensile.file5.UStrain]);
+    n.UStressSD = std([Tensile.file5.UStress]);
+    props_MeanSD_tens5 = n;
+</pre><img vspace="5" hspace="5" src="BME302_Lab3_Tensile_05.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%BME 302, Lab 3, Tissue Testing - TENSILE (excluding rattailcollagen)
+%Mackenzie Marques 
+
+clear all 
+close all
+
+%% Load Data
+source_dirTens = 'C:\Users\Mackenzie\Documents\MATLAB\BME302_Lab\LAB3\Tension';
+TensFile = dir(fullfile(source_dirTens,'*.xlsx'));
+for j = 1:5
+    [num,txt,raw] = xlsread(TensFile(j).name);
+    name = extractBefore(TensFile(j).name, '.xlsx');
+    name = strrep(name,'1','');  
+numtrials = numel(num(1,:))/2;  
+SET = struct('Material', {},...
+    'GageLength', {},...
+    'Thickness', {},...
+    'Width', {},...
+    'Area', {},...
+    'Position', {},...
+    'Load', {},...
+    'Stress', {},...
+    'Strain', {});
+for k = 1:numtrials
+    i = 2*k-1;
+    s.Material = name;
+    s.GageLength = num(1,i+1);
+    s.Thickness = num(2,i+1);
+    s.Width = num(3,i+1);
+    s.Area = num(4,i+1);
+    s.Position = num(8:end,i);
+    s.Load = num(8:end,i+1);
+    s.Position(isnan(s.Position)) = [];
+    s.Load(isnan(s.Load)) = [];
+    s.Stress = (s.Load)./(s.Area);
+    s.Strain = (s.Position)./(s.GageLength);
+    SET(k) = s;
+end 
+Tensile.(sprintf('file%d', j))=SET;
+end
+%% Mean + SD of measurement values
+clear h m 
+MeanSD_tens = struct('GageLengthMean', {},...
+    'ThicknessMean', {},...
+    'WidthMean', {},...
+    'AreaMean', {},...
+    'GageLengthSD', {},...
+    'ThicknessSD', {},...
+    'WidthSD', {},...
+    'AreaSD',{});
+for h = 1:5
+    m.GageLengthMean = mean([Tensile.(sprintf('file%d', h)).GageLength]);
+    m.ThicknessMean = mean([Tensile.(sprintf('file%d', h)).Thickness]);
+    m.WidthMean = mean([Tensile.(sprintf('file%d', h)).Width]);
+    m.AreaMean = mean([Tensile.(sprintf('file%d', h)).Area]);
+    m.GageLengthSD = std([Tensile.(sprintf('file%d', h)).GageLength]);
+    m.ThicknessSD = std([Tensile.(sprintf('file%d', h)).Thickness]);
+    m.WidthSD = std([Tensile.(sprintf('file%d', h)).Width]);
+    m.AreaSD = std([Tensile.(sprintf('file%d', h)).Area]);
+    MeanSD_tens(h) = m;
+end
+%% Stress Strain Plots
+        %% file 1 - remove fracture region, find 1st & 2nd derivative
+        clf(figure(1))
+        figure(1)
+        for d = 1:numel(Tensile.file1)
+        StressNew = downsample(Tensile.file1(d).Stress, 3);
+        StrainNew = downsample(Tensile.file1(d).Strain, 3);
+        [Tensile.file1(d).StressNew] = StressNew;
+        [Tensile.file1(d).StrainNew] = StrainNew;
+        %[~ , Locs] = findpeaks(Tensile.file1(d).StressNew);
+        %if length(Tensile.file1(d).StrainNew) >= Locs(end)
+            %Tensile.file1(d).StrainNew(Locs(end):end) = [];
+            %Tensile.file1(d).StressNew(Locs(end):end) = [];
+        %end 
+        for f = numel(Tensile.file1):1
+            X = find(Tensile.file1(f).diff <= -50);
+            Tensile.file1(f).StressNew(X) = [];
+            Tensile.file1(f).StrainNew(X) = [];
+        end 
+        Tensile.file1(d).StressNew = smooth((Tensile.file1(d).StrainNew), (Tensile.file1(d).StressNew),0.1, 'loess');
+        %[~ , Locs1] = findpeaks(Tensile.file1(d).StressNew);
+        %if length(Tensile.file1(d).StrainNew) >= Locs1(end)
+            %Tensile.file1(d).StrainNew(Locs1(end):end) = [];
+            %Tensile.file1(d).StressNew(Locs1(end):end) = [];
+        %end 
+        %[Tensile.file1(d).StrainNew, Tensile.file1(d).StressNew] = ...
+        %smoothing((Tensile.file1(d).StrainNew), (Tensile.file1(d).StressNew));
+        [Tensile.file1(d).diff] = diff(Tensile.file1(d).StressNew)./...
+            diff(Tensile.file1(d).StrainNew);
+        [Tensile.file1(d).diff2] = diff(Tensile.file1(d).diff)./...
+            diff(Tensile.file1(d).StrainNew(2:end));
+        %subplot(2,2,1)
+        hold on 
+        plot(Tensile.file1(d).Strain, Tensile.file1(d).Stress);
+        xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        title(['Noisy Stress vs. Strain ', Tensile.file1(d).Material])
+        hold off
+        %subplot(2,2,2)
+        hold on
+        %plot(Tensile.file1(d).StrainNew, Tensile.file1(d).StressNew);
+        xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        %title(['Cleaned Stress vs. Strain ', Tensile.file1(d).Material])
+        hold off
+        end 
+clear d c f 
+P = zeros(1,18);
+E = zeros(1,9);
+YieldStress = zeros(1,9);
+    for d = 1:numel(Tensile.file1)         
+        keepgoing = true;
+        f = 1;
+        Window = 1;
+        while (f+Window < numel(Tensile.file1(d).StrainNew)) && keepgoing
+            R = corr(Tensile.file1(d).StrainNew(f:f+Window),...
+                Tensile.file1(d).StressNew(f:f+Window));
+            if R > 0.97
+                keepgoing = true;
+                f = f+Window;
+            else
+                keepgoing = false;
+                X = Tensile.file1(d).StrainNew(1:f+Window);
+                Y = Tensile.file1(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file1(d).StressNew(f+Window);
+                for c = 2*d-1 
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                end 
+            end
+        end 
+   [Tensile.file1(d).E] = E(d);
+   [Tensile.file1(d).YS] = YieldStress(d);
+   [Tensile.file1(d).UStress] = max(Tensile.file1(d).StressNew);
+   R = find(Tensile.file1(d).StressNew == max(Tensile.file1(d).StressNew));
+   [Tensile.file1(d).UStrain] = Tensile.file1(d).StrainNew(R);  
+    end     
+H = find(E == 0);
+for d = H
+   YieldStress(d) = Tensile.file1(d).StressNew(end);
+   for c = 2*d-1 
+   P(c:c+1) = polyfit(Tensile.file1(d).StrainNew, Tensile.file1(d)...
+       .StressNew, 1);
+   E(d) = P(c);
+   end 
+   [Tensile.file1(d).E] = E(d);
+   [Tensile.file1(d).YS] = YieldStress(d);
+   [Tensile.file1(d).UStress] = max(Tensile.file1(d).StressNew);
+   R = find(Tensile.file1(d).StressNew == max(Tensile.file1(d).StressNew));
+   [Tensile.file1(d).UStrain] = Tensile.file1(d).StrainNew(R); 
+end 
+% Mean & SD - mech props
+props_MeanSD_tens1 = struct('EMean', {},...
+    'YSMean', {},...
+    'UStrainMean', {},...
+    'UStressMean', {},...
+    'ESD', {},...
+    'YSSD', {},...
+    'UStrainSD', {},...
+    'UStressSD', {});
+    n.EMean = mean([Tensile.file1.E]);
+    n.YSMean = mean([Tensile.file1.YS]);
+    n.UStrainMean = mean([Tensile.file1.UStrain]);
+    n.UStressMean = mean([Tensile.file1.UStress]);
+    n.ESD = std([Tensile.file1.E]);
+    n.YSSD = std([Tensile.file1.YS]);
+    n.UStrainSD = std([Tensile.file1.UStrain]);
+    n.UStressSD = std([Tensile.file1.UStress]);
+    props_MeanSD_tens1 = n;
+        %% file 2 - 1st & 2nd derivative
+        clf(figure(2))
+        figure(2)
+        for d = 1:numel(Tensile.file2)
+        StressNew = downsample(Tensile.file2(d).Stress, 5);
+        StrainNew = downsample(Tensile.file2(d).Strain, 5);
+        [Tensile.file2(d).StressNew] = StressNew;
+        [Tensile.file2(d).StrainNew] = StrainNew;
+        [Pks, Locs] = findpeaks(Tensile.file2(d).StressNew);
+        if length(Tensile.file2(d).StrainNew) >= Locs(end)
+            Tensile.file2(d).StrainNew(Locs(end):end) = [];
+            Tensile.file2(d).StressNew(Locs(end):end) = [];
+        end 
+        %X = max(Tensile.file1(d).StressNew);
+        %Y = find(Tensile.file1(d).StressNew == X);
+        %[Tensile.file1(d).StressNew] = Tensile.file1(d).StressNew(1:Y);
+        %[Tensile.file1(d).StrainNew] = Tensile.file1(d).StrainNew(1:Y);
+        Tensile.file2(d).StressNew = smooth((Tensile.file2(d).StrainNew),...
+            (Tensile.file2(d).StressNew),0.1, 'loess');
+        [Tensile.file2(d).diff] = diff(Tensile.file2(d).StressNew)./...
+            diff(Tensile.file2(d).StrainNew);
+        [Tensile.file2(d).diff2] = diff(Tensile.file2(d).diff)./...
+            diff(Tensile.file2(d).StrainNew(2:end));
+        %subplot(2,2,1)
+        hold on 
+        plot(Tensile.file2(d).Strain, Tensile.file2(d).Stress);
+        xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        title(['Noisy Stress vs. Strain ', Tensile.file2(d).Material])
+        hold off
+        %subplot(2,2,2)
+        hold on
+        %plot(Tensile.file2(d).StrainNew, Tensile.file2(d).StressNew);
+        xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        end 
+clear d c f 
+P = zeros(1,16);
+E = zeros(1,8);
+YieldStress = zeros(1,8);
+    for d = 1:numel(Tensile.file2)         
+        keepgoing = true;
+        f = 1;
+        Window = 1;
+        while (f+Window < numel(Tensile.file2(d).StrainNew)) && keepgoing
+            R = corr(Tensile.file2(d).StrainNew(f:f+Window),...
+                Tensile.file2(d).StressNew(f:f+Window));
+            if R > 0.97
+                keepgoing = true;
+                f = f+Window;
+            else
+                keepgoing = false;
+                X = Tensile.file2(d).StrainNew(1:f+Window);
+                Y = Tensile.file2(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file2(d).StressNew(f+Window);
+                for c = 2*d-1 
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                end 
+            end
+        end 
+   [Tensile.file2(d).E] = E(d);
+   [Tensile.file2(d).YS] = YieldStress(d);
+   [Tensile.file2(d).UStress] = max(Tensile.file2(d).StressNew);
+   R = find(Tensile.file2(d).StressNew == max(Tensile.file2(d).StressNew));
+   [Tensile.file2(d).UStrain] = Tensile.file2(d).StrainNew(R);    
+    end     
+H = find(E == 0);
+for d = H
+   YieldStress(d) = Tensile.file2(d).StressNew(end);
+   for c = 2*d-1 
+   P(c:c+1) = polyfit(Tensile.file2(d).StrainNew, Tensile.file2(d)...
+       .StressNew, 1);
+   E(d) = P(c);
+   end 
+   [Tensile.file2(d).E] = E(d);
+   [Tensile.file2(d).YS] = YieldStress(d);
+   [Tensile.file2(d).UStress] = max(Tensile.file2(d).StressNew);
+   R = find(Tensile.file2(d).StressNew == max(Tensile.file2(d).StressNew));
+   [Tensile.file2(d).UStrain] = Tensile.file2(d).StrainNew(R); 
+end 
+% Mean & SD - mech props
+props_MeanSD_tens2 = struct('EMean', {},...
+    'YSMean', {},...
+    'UStrainMean', {},...
+    'UStressMean', {},...
+    'ESD', {},...
+    'YSSD', {},...
+    'UStrainSD', {},...
+    'UStressSD', {});
+    n.EMean = mean([Tensile.file2.E]);
+    n.YSMean = mean([Tensile.file2.YS]);
+    n.UStrainMean = mean([Tensile.file2.UStrain]);
+    n.UStressMean = mean([Tensile.file2.UStress]);
+    n.ESD = std([Tensile.file2.E]);
+    n.YSSD = std([Tensile.file2.YS]);
+    n.UStrainSD = std([Tensile.file2.UStrain]);
+    n.UStressSD = std([Tensile.file2.UStress]);
+    props_MeanSD_tens2 = n;
+        %% file 3 - remove fracture region, find 1st & 2nd derivative
+        clf(figure(3))
+        figure(3)
+        for d = 1:numel(Tensile.file3)
+        StressNew = downsample(Tensile.file3(d).Stress, 5);
+        StrainNew = downsample(Tensile.file3(d).Strain, 5);
+        [Tensile.file3(d).StressNew] = StressNew;
+        [Tensile.file3(d).StrainNew] = StrainNew;
+        [Pks, Locs] = findpeaks(Tensile.file3(d).StressNew);
+        if length(Tensile.file3(d).StrainNew) >= Locs(end)
+            Tensile.file3(d).StrainNew(Locs(end):end) = [];
+            Tensile.file3(d).StressNew(Locs(end):end) = [];
+        end 
+        %X = max(Tensile.file4(d).StressNew);
+        %Y = find([Tensile.file4(d).StressNew] == X);
+        %[Tensile.file4(d).StressNew] = Tensile.file4(d).StressNew(1:Y);
+        %[Tensile.file4(d).StrainNew] = Tensile.file4(d).StrainNew(1:Y);
+        Tensile.file3(d).StressNew = smooth((Tensile.file3(d).StrainNew),...
+            (Tensile.file3(d).StressNew),0.1, 'loess');
+        [Tensile.file3(d).diff] = diff(Tensile.file3(d).StressNew)./...
+            diff(Tensile.file3(d).StrainNew);
+        [Tensile.file3(d).diff2] = diff(Tensile.file3(d).diff)./...
+            diff(Tensile.file3(d).StrainNew(2:end));
+        %subplot(2,2,1)
+        hold on 
+        plot(Tensile.file3(d).Strain, Tensile.file3(d).Stress);
+        xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        title(['Stress vs. Strain ', Tensile.file3(d).Material])
+        hold off
+        %subplot(2,2,2)
+        hold on
+        %plot(Tensile.file3(d).StrainNew, Tensile.file3(d).StressNew);
+        xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        hold off
+        end 
+clear d c f 
+P = zeros(1,20);
+E = zeros(1,10);
+YieldStress = zeros(1,10);
+    for d = 1:numel(Tensile.file3)         
+        keepgoing = true;
+        f = 1;
+        Window = 1;
+        while (f+Window < numel(Tensile.file3(d).StrainNew)) && keepgoing
+            R = corr(Tensile.file3(d).StrainNew(f:f+Window),...
+                Tensile.file3(d).StressNew(f:f+Window));
+            if R > 0.97
+                keepgoing = true;
+                f = f+Window;
+            else
+                keepgoing = false;
+                X = Tensile.file3(d).StrainNew(1:f+Window);
+                Y = Tensile.file3(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file3(d).StressNew(f+Window);
+                for c = 2*d-1 
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                end 
+            end
+        end 
+   [Tensile.file3(d).E] = E(d);
+   [Tensile.file3(d).YS] = YieldStress(d);
+   [Tensile.file3(d).UStress] = max(Tensile.file3(d).StressNew);
+   R = find(Tensile.file3(d).StressNew == max(Tensile.file3(d).StressNew));
+   [Tensile.file3(d).UStrain] = Tensile.file3(d).StrainNew(R);  
+    end     
+H = find(E == 0);
+for d = H
+   YieldStress(d) = Tensile.file3(d).StressNew(end);
+   for c = 2*d-1 
+   P(c:c+1) = polyfit(Tensile.file3(d).StrainNew,...
+       Tensile.file3(d).StressNew, 1);
+   E(d) = P(c);
+   end 
+   [Tensile.file3(d).E] = E(d);
+   [Tensile.file3(d).YS] = YieldStress(d);
+   [Tensile.file3(d).UStress] = max(Tensile.file3(d).StressNew);
+   R = find(Tensile.file3(d).StressNew == max(Tensile.file3(d).StressNew));
+   [Tensile.file3(d).UStrain] = Tensile.file3(d).StrainNew(R); 
+end 
+% Mean & SD - mech props
+props_MeanSD_tens3 = struct('EMean', {},...
+    'YSMean', {},...
+    'UStrainMean', {},...
+    'UStressMean', {},...
+    'ESD', {},...
+    'YSSD', {},...
+    'UStrainSD', {},...
+    'UStressSD', {});
+    n.EMean = mean([Tensile.file3.E]);
+    n.YSMean = mean([Tensile.file3.YS]);
+    n.UStrainMean = mean([Tensile.file3.UStrain]);
+    n.UStressMean = mean([Tensile.file3.UStress]);
+    n.ESD = std([Tensile.file3.E]);
+    n.YSSD = std([Tensile.file3.YS]);
+    n.UStrainSD = std([Tensile.file3.UStrain]);
+    n.UStressSD = std([Tensile.file3.UStress]);
+    props_MeanSD_tens3 = n;     
+        %% file 4 - remove fracture region, find 1st & 2nd derivative
+        clf(figure(4))
+        figure(4)
+        for d = 1:numel(Tensile.file4)
+        StressNew = downsample(Tensile.file4(d).Stress, 5);
+        StrainNew = downsample(Tensile.file4(d).Strain, 5);
+        [Tensile.file4(d).StressNew] = StressNew;
+        [Tensile.file4(d).StrainNew] = StrainNew;
+        [Pks, Locs] = findpeaks(Tensile.file4(d).StressNew);
+        if length(Tensile.file4(d).StrainNew) >= Locs(end)
+            Tensile.file4(d).StrainNew(Locs(end):end) = [];
+            Tensile.file4(d).StressNew(Locs(end):end) = [];
+        end 
+        %X = max(Tensile.file4(d).StressNew);
+        %Y = find([Tensile.file4(d).StressNew] == X);
+        %[Tensile.file4(d).StressNew] = Tensile.file4(d).StressNew(1:Y);
+        %[Tensile.file4(d).StrainNew] = Tensile.file4(d).StrainNew(1:Y);
+        Tensile.file4(d).StressNew = smooth((Tensile.file4(d).StrainNew),...
+            (Tensile.file4(d).StressNew),0.1, 'loess');
+        [Tensile.file4(d).diff] = diff(Tensile.file4(d).StressNew)./...
+            diff(Tensile.file4(d).StrainNew);
+        [Tensile.file4(d).diff2] = diff(Tensile.file4(d).diff)./...
+            diff(Tensile.file4(d).StrainNew(2:end));
+        %subplot(2,2,1)
+        hold on 
+        plot(Tensile.file4(d).Strain, Tensile.file4(d).Stress);
+        xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        title(['Noisy Stress vs. Strain ', Tensile.file4(d).Material])
+        hold off
+        %subplot(2,2,2)
+        hold on
+        %plot(Tensile.file4(d).StrainNew, Tensile.file4(d).StressNew);
+        xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        hold off
+        end 
+clear d c f 
+P = zeros(1,20);
+E = zeros(1,10);
+YieldStress = zeros(1,10);
+    for d = 1:numel(Tensile.file4)         
+        keepgoing = true;
+        f = 1;
+        Window = 1;
+        while (f+Window < numel(Tensile.file4(d).StrainNew)) && keepgoing
+            R = corr(Tensile.file4(d).StrainNew(f:f+Window),...
+                Tensile.file4(d).StressNew(f:f+Window));
+            if R > 0.97
+                keepgoing = true;
+                f = f+Window;
+            else
+                keepgoing = false;
+                X = Tensile.file4(d).StrainNew(1:f+Window);
+                Y = Tensile.file4(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file4(d).StressNew(f+Window);
+                for c = 2*d-1 
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                end 
+            end
+        end 
+   [Tensile.file4(d).E] = E(d);
+   [Tensile.file4(d).YS] = YieldStress(d);
+   [Tensile.file4(d).UStress] = max(Tensile.file4(d).StressNew);
+   R = find(Tensile.file4(d).StressNew == max(Tensile.file4(d).StressNew));
+   [Tensile.file4(d).UStrain] = Tensile.file4(d).StrainNew(R); 
+    end     
+H = find(E == 0);
+for d = H
+   YieldStress(d) = Tensile.file4(d).StressNew(end);
+   for c = 2*d-1 
+   P(c:c+1) = polyfit(Tensile.file4(d).StrainNew,...
+       Tensile.file4(d).StressNew, 1);
+   E(d) = P(c);
+   end 
+   [Tensile.file4(d).E] = E(d);
+   [Tensile.file4(d).YS] = YieldStress(d);
+   [Tensile.file4(d).UStress] = max(Tensile.file4(d).StressNew);
+   R = find(Tensile.file4(d).StressNew == max(Tensile.file4(d).StressNew));
+   [Tensile.file4(d).UStrain] = Tensile.file4(d).StrainNew(R);
+end 
+% Mean & SD - mech props
+props_MeanSD_tens4 = struct('EMean', {},...
+    'YSMean', {},...
+    'UStrainMean', {},...
+    'UStressMean', {},...
+    'ESD', {},...
+    'YSSD', {},...
+    'UStrainSD', {},...
+    'UStressSD', {});
+    n.EMean = mean([Tensile.file4.E]);
+    n.YSMean = mean([Tensile.file4.YS]);
+    n.UStrainMean = mean([Tensile.file4.UStrain]);
+    n.UStressMean = mean([Tensile.file4.UStress]);
+    n.ESD = std([Tensile.file4.E]);
+    n.YSSD = std([Tensile.file4.YS]);
+    n.UStrainSD = std([Tensile.file4.UStrain]);
+    n.UStressSD = std([Tensile.file4.UStress]);
+    props_MeanSD_tens4 = n;        
+        %% file 5 - 1st & 2nd derivative
+        clf(figure(5))
+        figure(5)
+        for d = 1:numel(Tensile.file5)
+        StressNew = downsample(Tensile.file5(d).Stress, 4);
+        StrainNew = downsample(Tensile.file5(d).Strain, 4);
+        [Tensile.file5(d).StressNew] = StressNew;
+        [Tensile.file5(d).StrainNew] = StrainNew;
+        [Pks, Locs] = findpeaks(Tensile.file5(d).StressNew);
+        if length(Tensile.file5(d).StrainNew) >= Locs(end)
+            Tensile.file5(d).StrainNew(Locs(end):end) = [];
+            Tensile.file5(d).StressNew(Locs(end):end) = [];
+        end 
+        %X = max(Tensile.file4(d).StressNew);
+        %Y = find([Tensile.file4(d).StressNew] == X);
+        %[Tensile.file4(d).StressNew] = Tensile.file4(d).StressNew(1:Y);
+        %[Tensile.file4(d).StrainNew] = Tensile.file4(d).StrainNew(1:Y);
+        Tensile.file5(d).StressNew = smooth((Tensile.file5(d).StrainNew),...
+            (Tensile.file5(d).StressNew),0.1, 'loess');
+        [Tensile.file5(d).diff] = diff(Tensile.file5(d).StressNew)./...
+            diff(Tensile.file5(d).StrainNew);
+        [Tensile.file5(d).diff2] = diff(Tensile.file5(d).diff)./...
+            diff(Tensile.file5(d).StrainNew(2:end));
+        Tensile.file5(d).diff = smooth((Tensile.file5(d)....
+            .StrainNew(2:end)), (Tensile.file5(d).diff),0.1, 'loess');
+        %subplot(2,2,1)
+        hold on 
+        plot(Tensile.file5(d).Strain, Tensile.file5(d).Stress);
+        xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        title(['Noisy Stress vs. Strain ', Tensile.file5(d).Material])
+        hold off
+        %subplot(2,2,2)
+        hold on
+        %plot(Tensile.file5(d).StrainNew, Tensile.file5(d).StressNew);
+                xlabel('Strain (mm/mm)');
+        ylabel('Stress (N/{mm}^2)');
+        hold off
+        end
+clear d c f 
+P = zeros(1,16);
+E = zeros(1,8);
+YieldStress = zeros(1,8);
+    for d = 1:numel(Tensile.file5)         
+        keepgoing = true;
+        f = 1;
+        Window = 15;
+        if numel(Tensile.file5(d).StressNew) < 1579 &&...
+                numel(Tensile.file5(d).StressNew) > 1570
+            Window = 1000;
+        end
+        if numel(Tensile.file5(d).StressNew) < 2000 &&...
+                numel(Tensile.file5(d).StressNew) > 1800
+            Window = 1000;
+        end
+        while (f+Window < numel(Tensile.file5(d).StrainNew)) && keepgoing
+            R = corr(Tensile.file5(d).StrainNew(f:f+Window)...
+                , Tensile.file5(d).StressNew(f:f+Window));
+            if R > 0.94
+                keepgoing = true;
+                f = f+Window;
+            else
+                keepgoing = false;
+                X = Tensile.file5(d).StrainNew(1:f+Window);
+                Y = Tensile.file5(d).StressNew(1:f+Window);
+                YieldStress(d) = Tensile.file5(d).StressNew(f+Window);
+                for c = 2*d-1 
+                P(c:c+1) = polyfit(X, Y, 1);
+                E(d) = abs(P(c));
+                end 
+            end
+        end 
+   [Tensile.file5(d).E] = E(d);
+   [Tensile.file5(d).YS] = YieldStress(d);
+   [Tensile.file5(d).UStress] = max(Tensile.file5(d).StressNew);
+   R = find(Tensile.file5(d).StressNew == max(Tensile.file5(d).StressNew));
+   [Tensile.file5(d).UStrain] = Tensile.file5(d).StrainNew(R);  
+    end     
+H = find(E == 0);
+for d = H
+   YieldStress(d) = Tensile.file5(d).StressNew(end);
+   for c = 2*d-1 
+   P(c:c+1) = polyfit(Tensile.file5(d).StrainNew,...
+       Tensile.file5(d).StressNew, 1);
+   E(d) = P(c);
+   end 
+   [Tensile.file5(d).E] = E(d);
+   [Tensile.file5(d).YS] = YieldStress(d);
+   [Tensile.file5(d).UStress] = max(Tensile.file5(d).StressNew);
+   R = find(Tensile.file5(d).StressNew == max(Tensile.file5(d).StressNew));
+   [Tensile.file5(d).UStrain] = Tensile.file5(d).StrainNew(R);
+end 
+% Mean & SD - mech props
+props_MeanSD_tens5 = struct('EMean', {},...
+    'YSMean', {},...
+    'UStrainMean', {},...
+    'UStressMean', {},...
+    'ESD', {},...
+    'YSSD', {},...
+    'UStrainSD', {},...
+    'UStressSD', {});
+    n.EMean = mean([Tensile.file5.E]);
+    n.YSMean = mean([Tensile.file5.YS]);
+    n.UStrainMean = mean([Tensile.file5.UStrain]);
+    n.UStressMean = mean([Tensile.file5.UStress]);
+    n.ESD = std([Tensile.file5.E]);
+    n.YSSD = std([Tensile.file5.YS]);
+    n.UStrainSD = std([Tensile.file5.UStrain]);
+    n.UStressSD = std([Tensile.file5.UStress]);
+    props_MeanSD_tens5 = n;      
+##### SOURCE END #####
+--></body></html>

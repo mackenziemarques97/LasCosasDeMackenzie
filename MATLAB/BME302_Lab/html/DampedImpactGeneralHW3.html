@@ -1,0 +1,426 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>DampedImpactGeneralHW3</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-03-30"><meta name="DC.source" content="DampedImpactGeneralHW3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% DampedImpactGeneralHW.m</span>
+
+<span class="comment">% The code for a critically damped system is provided below. Your homework</span>
+<span class="comment">% is to complete the code so that it can plot results for an overdamped</span>
+<span class="comment">% system (DF&gt;1) and an underdamped system (DF&lt;1).</span>
+
+<span class="comment">% v4 - 3/26/13 update the comments to specify a change in C to change DF.</span>
+
+<span class="comment">% The DF can be changed by changing C. Turn in overlayed plots for DFs of</span>
+<span class="comment">% 0.25, 0.5, 1, 2, and 4</span>
+
+K = 1;          <span class="comment">% Stiffness</span>
+M = 1;          <span class="comment">% Mass</span>
+C = 8;          <span class="comment">% Damping Constant</span>
+
+<span class="comment">% The Initial Conditions - note that they are generalized, but for impact,</span>
+<span class="comment">% Xo should be set to 0.</span>
+
+Vo = 6;         <span class="comment">% Initial Velocity</span>
+Xo = 0;         <span class="comment">% Initial Displacement</span>
+
+<span class="comment">% The values of the parameters below will be reported in the Command Window</span>
+<span class="comment">% - you may find them useful for tuing your system</span>
+
+OmegaN = sqrt(K/M);				<span class="comment">% Natural Frequency (Rad/sec)</span>
+DF = C/(2*M*OmegaN)				<span class="comment">% Damping Factor</span>
+OmegaD = OmegaN*sqrt(1-DF^2);	<span class="comment">% Damped Natural Frequency (Rad/sec)</span>
+CriticalC = 2*M*OmegaN			<span class="comment">% Critical Damping Constant</span>
+Undampedfreq = OmegaN/(2*pi)    <span class="comment">% Undamped Natural Frequency</span>
+Dampedfreq = OmegaD/(2*pi)      <span class="comment">% Damped Natural Frequency</span>
+period = 1/Undampedfreq;
+
+<span class="comment">% controls the range and sampling on the time axis</span>
+
+numperiods = 1; <span class="comment">% controls the range on the time axis</span>
+timeaxis = period*numperiods;
+t = 0:timeaxis/500:timeaxis;
+
+
+<span class="comment">%   For a critically damped system</span>
+
+<span class="keyword">if</span> DF==1
+    A1=Xo;
+    A2=Vo+Xo*DF*OmegaN;
+    x = (A1+A2*t).*exp(-DF*OmegaN*t);
+    v = (-A1*DF*OmegaN+A2*(1-DF*OmegaN*t)).*exp(-DF*OmegaN*t);
+    F = M*(A1*(DF*OmegaN)^2-A2*(2*DF*OmegaN-(DF*OmegaN)^2*t)).*exp(-DF*OmegaN*t);
+    subplot(2,2,1)
+    <span class="comment">% plot the displacment history</span>
+    plot(t,x,<span class="string">'-g'</span>,<span class="string">'linewidth'</span>, 2);
+    hold <span class="string">off</span>
+    hold <span class="string">on</span>      <span class="comment">% uncomment this line to overlay plots for each run</span>
+    xlabel(<span class="string">'time [sec]'</span>), ylabel(<span class="string">'displacement [m]'</span>)
+    grid
+    title(<span class="string">'Damped Impact'</span>)
+    subplot(2,2,2)
+    <span class="comment">% plot the velocity history</span>
+    plot(t,v,<span class="string">'-g'</span>,<span class="string">'linewidth'</span>, 2);
+    hold <span class="string">off</span>
+    hold <span class="string">on</span>      <span class="comment">% uncomment this line to overlay plots for each run</span>
+    xlabel(<span class="string">'time [sec]'</span>), ylabel(<span class="string">'Velocity [m/s]'</span>)
+    grid
+    subplot(2,2,3)
+    <span class="comment">% plot the force history</span>
+    plot(t,F,<span class="string">'-g'</span>,<span class="string">'linewidth'</span>, 2);
+    hold <span class="string">off</span>
+    hold <span class="string">on</span>      <span class="comment">% uncomment this line to overlay plots for each run</span>
+    xlabel(<span class="string">'time [sec]'</span>), ylabel(<span class="string">'Force (N)'</span>)
+    grid
+    subplot(2,2,4)
+    <span class="comment">% plot the force-displacment response</span>
+    plot(x,F,<span class="string">'-g'</span>,<span class="string">'linewidth'</span>, 2);
+    hold <span class="string">off</span>
+    hold <span class="string">on</span>      <span class="comment">% uncomment this line to overlay plots for each run</span>
+    xlabel(<span class="string">'displacement [m]'</span>), ylabel(<span class="string">'Force (N)'</span>)
+    grid
+<span class="keyword">end</span>
+
+<span class="comment">%   For an underdamped system - YOU NEED TO DERIVE AND CODE THIS</span>
+
+<span class="keyword">if</span> DF&lt;1
+    disp(<span class="string">'This is your HW - you have not coded this DF condition yet'</span>)
+    s2 = (-DF + (((DF).^2)-1)^(0.5)).*OmegaN;
+    s1 = (-DF - (((DF).^2)-1)^(0.5)).*OmegaN;
+    A1 = -(6./(s2-s1));
+    A2 = (6./(s2-s1));
+    x = A1.*exp(s1.*t)+A2.*exp(s2.*t);
+    v = A1.*s1.*exp(s1.*t)+A2.*s2.*exp(s2.*t);
+    F = M.*(A1.*(s1.^2).*exp(s1.*t)+A2.*(s2.^2).*exp(s2.*t));
+    <span class="comment">%A1 = Xo/2;</span>
+    <span class="comment">%A2 = (-Vo + DF.*OmegaN.*Xo)./(2.*OmegaD);</span>
+    <span class="comment">%x = (A1.*exp(1i.*OmegaD.*t)+A2.*exp(-1i.*OmegaD.*t)).*exp(-DF.*OmegaN.*t);</span>
+    <span class="comment">%v = (exp(DF.*OmegaN.*(t.^2).*1i.*OmegaD).*((1i.*A1.*exp(2.*1i.*OmegaD.*t).*(OmegaD+(1i.*DF.*OmegaN))+(A2((-DF.*OmegaN)-(1i.*OmegaD))))));</span>
+    <span class="comment">%F = M.*((-C.*(OmegaD.^2).*exp(-DF.*OmegaN.*t).*sind(OmegaD.*t+phase))+(C.*(DF.^2).*(OmegaN.^2).*exp(-DF.*OmegaN.*t).*sind(OmegaD.*t+phase))-(2.*C.*DF.*OmegaD.*OmegaN.*exp(-DF.*OmegaN.*t).*cosd(OmegaD.*t+phase)));</span>
+     subplot(2,2,1)
+     <span class="comment">% plot the displacment history</span>
+     plot(t,x,<span class="string">'-r'</span>,<span class="string">'linewidth'</span>, 2);
+     hold <span class="string">off</span>
+     hold <span class="string">on</span>
+     xlabel(<span class="string">'time [sec]'</span>), ylabel(<span class="string">'displacement [m]'</span>)
+     grid
+     title(<span class="string">'Damped Impact'</span>)
+     subplot(2,2,2)
+     <span class="comment">% plot the velocity history</span>
+     plot(t,v,<span class="string">'-r'</span>,<span class="string">'linewidth'</span>, 2);
+     hold <span class="string">off</span>
+     hold <span class="string">on</span>
+     xlabel(<span class="string">'time [sec]'</span>), ylabel(<span class="string">'Velocity [m/s]'</span>)
+     grid
+     subplot(2,2,3)
+     <span class="comment">% plot the force history</span>
+     plot(t,F, <span class="string">'r'</span>, <span class="string">'linewidth'</span>, 2);
+     hold <span class="string">off</span>
+     hold <span class="string">on</span>
+     xlabel(<span class="string">'time [sec]'</span>), ylabel(<span class="string">'Force (N)'</span>)
+     grid
+     subplot(2,2,4)
+     <span class="comment">% plot the force-displacment response</span>
+     plot(x,F,<span class="string">'-r'</span>,<span class="string">'linewidth'</span>, 2);
+     hold <span class="string">off</span>
+     hold <span class="string">on</span>
+     xlabel(<span class="string">'displacement [m]'</span>), ylabel(<span class="string">'Force (N)'</span>)
+     grid
+<span class="keyword">end</span>
+
+<span class="comment">%   For an overdamped system - YOU NEED TO DERIVE AND CODE THIS</span>
+
+<span class="keyword">if</span> DF&gt;1
+    disp(<span class="string">'This is your HW - you have not coded this DF condition yet'</span>)
+    s2 = (-DF + (((DF).^2)-1)^(0.5)).*OmegaN;
+    s1 = (-DF - (((DF).^2)-1)^(0.5)).*OmegaN;
+    A1 = -(6./(s2-s1));
+    A2 = (6./(s2-s1));
+    x = A1.*exp(s1.*t)+A2.*exp(s2.*t);
+    v = A1.*s1.*exp(s1.*t)+A2.*s2.*exp(s2.*t);
+    F = M.*(A1.*(s1.^2).*exp(s1.*t)+A2.*(s2.^2).*exp(s2.*t));
+    subplot(2,2,1)
+    <span class="comment">% plot the displacment history</span>
+    plot(t,x,<span class="string">'-b'</span>,<span class="string">'linewidth'</span>, 2);
+    hold <span class="string">off</span>
+    hold <span class="string">on</span>
+    xlabel(<span class="string">'time [sec]'</span>), ylabel(<span class="string">'displacement [m]'</span>)
+    grid
+    title(<span class="string">'Damped Impact'</span>)
+    subplot(2,2,2)
+    <span class="comment">% plot the velocity history</span>
+    plot(t,v,<span class="string">'-b'</span>,<span class="string">'linewidth'</span>, 2);
+    hold <span class="string">off</span>
+    hold <span class="string">on</span>
+    xlabel(<span class="string">'time [sec]'</span>), ylabel(<span class="string">'Velocity [m/s]'</span>)
+    grid
+    subplot(2,2,3)
+    <span class="comment">% plot the force history</span>
+    plot(t,F, <span class="string">'b'</span>, <span class="string">'linewidth'</span>, 2);
+    hold <span class="string">off</span>
+    hold <span class="string">on</span>
+    xlabel(<span class="string">'time [sec]'</span>), ylabel(<span class="string">'Force (N)'</span>)
+    grid
+    subplot(2,2,4)
+    <span class="comment">% plot the force-displacment response</span>
+    plot(x,F,<span class="string">'-b'</span>,<span class="string">'linewidth'</span>, 2);
+    hold <span class="string">off</span>
+    hold <span class="string">on</span>
+    xlabel(<span class="string">'displacement [m]'</span>), ylabel(<span class="string">'Force (N)'</span>)
+    grid
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">
+DF =
+
+     4
+
+
+CriticalC =
+
+     2
+
+
+Undampedfreq =
+
+    0.1592
+
+
+Dampedfreq =
+
+   0.0000 + 0.6164i
+
+This is your HW - you have not coded this DF condition yet
+</pre><img vspace="5" hspace="5" src="DampedImpactGeneralHW3_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+
+% DampedImpactGeneralHW.m
+
+% The code for a critically damped system is provided below. Your homework
+% is to complete the code so that it can plot results for an overdamped
+% system (DF>1) and an underdamped system (DF<1).
+
+% v4 - 3/26/13 update the comments to specify a change in C to change DF.
+
+% The DF can be changed by changing C. Turn in overlayed plots for DFs of
+% 0.25, 0.5, 1, 2, and 4
+
+K = 1;          % Stiffness
+M = 1;          % Mass
+C = 8;          % Damping Constant
+
+% The Initial Conditions - note that they are generalized, but for impact,
+% Xo should be set to 0.
+
+Vo = 6;         % Initial Velocity
+Xo = 0;         % Initial Displacement
+
+% The values of the parameters below will be reported in the Command Window
+% - you may find them useful for tuing your system
+
+OmegaN = sqrt(K/M);				% Natural Frequency (Rad/sec)
+DF = C/(2*M*OmegaN)				% Damping Factor
+OmegaD = OmegaN*sqrt(1-DF^2);	% Damped Natural Frequency (Rad/sec)
+CriticalC = 2*M*OmegaN			% Critical Damping Constant
+Undampedfreq = OmegaN/(2*pi)    % Undamped Natural Frequency
+Dampedfreq = OmegaD/(2*pi)      % Damped Natural Frequency
+period = 1/Undampedfreq;
+
+% controls the range and sampling on the time axis
+
+numperiods = 1; % controls the range on the time axis
+timeaxis = period*numperiods;
+t = 0:timeaxis/500:timeaxis;
+
+
+%   For a critically damped system
+
+if DF==1
+    A1=Xo;
+    A2=Vo+Xo*DF*OmegaN;
+    x = (A1+A2*t).*exp(-DF*OmegaN*t);
+    v = (-A1*DF*OmegaN+A2*(1-DF*OmegaN*t)).*exp(-DF*OmegaN*t);
+    F = M*(A1*(DF*OmegaN)^2-A2*(2*DF*OmegaN-(DF*OmegaN)^2*t)).*exp(-DF*OmegaN*t);
+    subplot(2,2,1)
+    % plot the displacment history
+    plot(t,x,'-g','linewidth', 2);
+    hold off
+    hold on      % uncomment this line to overlay plots for each run
+    xlabel('time [sec]'), ylabel('displacement [m]')
+    grid
+    title('Damped Impact')
+    subplot(2,2,2)
+    % plot the velocity history
+    plot(t,v,'-g','linewidth', 2);
+    hold off
+    hold on      % uncomment this line to overlay plots for each run
+    xlabel('time [sec]'), ylabel('Velocity [m/s]')
+    grid
+    subplot(2,2,3)
+    % plot the force history
+    plot(t,F,'-g','linewidth', 2);
+    hold off
+    hold on      % uncomment this line to overlay plots for each run
+    xlabel('time [sec]'), ylabel('Force (N)')
+    grid
+    subplot(2,2,4)
+    % plot the force-displacment response
+    plot(x,F,'-g','linewidth', 2);
+    hold off
+    hold on      % uncomment this line to overlay plots for each run
+    xlabel('displacement [m]'), ylabel('Force (N)')
+    grid
+end
+
+%   For an underdamped system - YOU NEED TO DERIVE AND CODE THIS
+
+if DF<1
+    disp('This is your HW - you have not coded this DF condition yet')
+    s2 = (-DF + (((DF).^2)-1)^(0.5)).*OmegaN;
+    s1 = (-DF - (((DF).^2)-1)^(0.5)).*OmegaN;
+    A1 = -(6./(s2-s1));
+    A2 = (6./(s2-s1));
+    x = A1.*exp(s1.*t)+A2.*exp(s2.*t);
+    v = A1.*s1.*exp(s1.*t)+A2.*s2.*exp(s2.*t);
+    F = M.*(A1.*(s1.^2).*exp(s1.*t)+A2.*(s2.^2).*exp(s2.*t));
+    %A1 = Xo/2;
+    %A2 = (-Vo + DF.*OmegaN.*Xo)./(2.*OmegaD);
+    %x = (A1.*exp(1i.*OmegaD.*t)+A2.*exp(-1i.*OmegaD.*t)).*exp(-DF.*OmegaN.*t);
+    %v = (exp(DF.*OmegaN.*(t.^2).*1i.*OmegaD).*((1i.*A1.*exp(2.*1i.*OmegaD.*t).*(OmegaD+(1i.*DF.*OmegaN))+(A2((-DF.*OmegaN)-(1i.*OmegaD))))));
+    %F = M.*((-C.*(OmegaD.^2).*exp(-DF.*OmegaN.*t).*sind(OmegaD.*t+phase))+(C.*(DF.^2).*(OmegaN.^2).*exp(-DF.*OmegaN.*t).*sind(OmegaD.*t+phase))-(2.*C.*DF.*OmegaD.*OmegaN.*exp(-DF.*OmegaN.*t).*cosd(OmegaD.*t+phase)));
+     subplot(2,2,1)
+     % plot the displacment history
+     plot(t,x,'-r','linewidth', 2);
+     hold off
+     hold on
+     xlabel('time [sec]'), ylabel('displacement [m]')
+     grid
+     title('Damped Impact')
+     subplot(2,2,2)
+     % plot the velocity history
+     plot(t,v,'-r','linewidth', 2);
+     hold off
+     hold on
+     xlabel('time [sec]'), ylabel('Velocity [m/s]')
+     grid
+     subplot(2,2,3)
+     % plot the force history
+     plot(t,F, 'r', 'linewidth', 2);
+     hold off
+     hold on
+     xlabel('time [sec]'), ylabel('Force (N)')
+     grid
+     subplot(2,2,4)
+     % plot the force-displacment response
+     plot(x,F,'-r','linewidth', 2);
+     hold off
+     hold on
+     xlabel('displacement [m]'), ylabel('Force (N)')
+     grid
+end
+
+%   For an overdamped system - YOU NEED TO DERIVE AND CODE THIS
+
+if DF>1
+    disp('This is your HW - you have not coded this DF condition yet')
+    s2 = (-DF + (((DF).^2)-1)^(0.5)).*OmegaN;
+    s1 = (-DF - (((DF).^2)-1)^(0.5)).*OmegaN;
+    A1 = -(6./(s2-s1));
+    A2 = (6./(s2-s1));
+    x = A1.*exp(s1.*t)+A2.*exp(s2.*t);
+    v = A1.*s1.*exp(s1.*t)+A2.*s2.*exp(s2.*t);
+    F = M.*(A1.*(s1.^2).*exp(s1.*t)+A2.*(s2.^2).*exp(s2.*t));
+    subplot(2,2,1)
+    % plot the displacment history
+    plot(t,x,'-b','linewidth', 2);
+    hold off
+    hold on
+    xlabel('time [sec]'), ylabel('displacement [m]')
+    grid
+    title('Damped Impact')
+    subplot(2,2,2)
+    % plot the velocity history
+    plot(t,v,'-b','linewidth', 2);
+    hold off
+    hold on
+    xlabel('time [sec]'), ylabel('Velocity [m/s]')
+    grid
+    subplot(2,2,3)
+    % plot the force history
+    plot(t,F, 'b', 'linewidth', 2);
+    hold off
+    hold on
+    xlabel('time [sec]'), ylabel('Force (N)')
+    grid
+    subplot(2,2,4)
+    % plot the force-displacment response
+    plot(x,F,'-b','linewidth', 2);
+    hold off
+    hold on
+    xlabel('displacement [m]'), ylabel('Force (N)')
+    grid
+end
+##### SOURCE END #####
+--></body></html>

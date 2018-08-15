@@ -1,0 +1,186 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>BME307_HW7_P2</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-03-29"><meta name="DC.source" content="BME307_HW7_P2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Euler numerical methods  - plot drug concentration</a></li><li><a href="#3">Plot of drug flux in tissue over time</a></li></ul></div><pre class="codeinput"><span class="comment">%BME 307, HW7, P2, Part E</span>
+<span class="comment">%Mackenzie Marques</span>
+<span class="comment">%03/27/2018</span>
+
+clear <span class="string">all</span>
+close <span class="string">all</span>
+</pre><h2 id="2">Euler numerical methods  - plot drug concentration</h2><pre class="codeinput">D = 2.33e-10; <span class="comment">% diffusion coefficient calculated from Part c; units: cm^2/s</span>
+x0 = 0; <span class="comment">%initial position, x=0, units: cm</span>
+xEnd = 0.004; <span class="comment">%final position, x=L, units: cm</span>
+t0 = 0; <span class="comment">%initial time, t=0, units: s</span>
+tEnd = 25*60; <span class="comment">%final time, t=1500, units: s</span>
+dt = 1; <span class="comment">%time step size, units: s</span>
+dx = (2.*D.*dt).^(0.5); <span class="comment">%position step size, units: cm</span>
+t = t0:dt:tEnd; <span class="comment">%time vector</span>
+x = x0:dx:xEnd; <span class="comment">%position vector</span>
+M = floor((tEnd-t0)./dt); <span class="comment">%time nodes</span>
+N = floor((xEnd-x0)./dx); <span class="comment">%position nodes</span>
+C = zeros(N+1,M+1); <span class="comment">%pre-allocated concentration  matrix</span>
+C(1,:) = 1e-9; <span class="comment">%1st boundary condition: x=0,t&gt;=0,C=1e-9</span>
+<span class="comment">%2nd boundary condition: x&gt;&gt;0,t&gt;=0,C=0</span>
+<span class="comment">%initial condition: x&gt;0,t=0,C=0</span>
+<span class="comment">%2nd boundary condition and initial condition already accounted for in</span>
+<span class="comment">%matrix of zeros</span>
+<span class="keyword">for</span> j = 1:M <span class="comment">%iterate through time nodes (columns)</span>
+    <span class="keyword">for</span> i = 2:N <span class="comment">%iterate through position nodes (rows)</span>
+        C(i,j+1) = C(i,j) + ((D.*dt)./(dx.^2)).*(C(i+1,j)-2.*C(i,j)+C(i-1,j)); <span class="comment">%numerical approximation of concentration from Fick's 2nd Law</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%alternative approach to organizing position</span>
+<span class="comment">%position = zeros(N+1,M+1);</span>
+<span class="comment">%for i = 1:N+1</span>
+    <span class="comment">%for j = 1:M+1</span>
+        <span class="comment">%position(i,j) = (i-1)*dx;</span>
+    <span class="comment">%end</span>
+<span class="comment">%end</span>
+figure(1)
+<span class="comment">%plot of concentration vs. position</span>
+<span class="comment">%each line represents a time</span>
+plot(x, C)
+title(<span class="string">'Drug Concentration vs. Position, Time'</span>);
+xlabel(<span class="string">'Distance into semi-infinite medium, x (cm)'</span>);
+ylabel(<span class="string">'Concentration, C (mol/cm^{3})'</span>);
+figure(2)
+plot(x, C(:,5), <span class="string">'k'</span>, x, C(:,20), <span class="string">'k:'</span>, x, C(:, 500), <span class="string">'k--'</span>, x, C(:,1000), <span class="string">'k-.'</span>, x, C(:,1500), <span class="string">'k*'</span>);
+legend(<span class="string">'t = 5s'</span>, <span class="string">'t = 20s'</span>, <span class="string">'t = 500s'</span>, <span class="string">'t = 1000s'</span>, <span class="string">'t = 1500s'</span>);
+title(<span class="string">'Drug Concentration vs. Position, Time'</span>);
+xlabel(<span class="string">'Distance into semi-infinite medium, x (cm)'</span>);
+ylabel(<span class="string">'Concentration, C (mol/cm^{3})'</span>);
+</pre><img vspace="5" hspace="5" src="BME307_HW7_P2_01.png" alt=""> <img vspace="5" hspace="5" src="BME307_HW7_P2_02.png" alt=""> <h2 id="3">Plot of drug flux in tissue over time</h2><pre class="codeinput">C1 = 1e-9; <span class="comment">%drug concentration within lumen; units: mol/cm^3</span>
+C0 = 0; <span class="comment">%drug concentration at end of semi-infinite medium; units: mol/cm^3</span>
+Nx = sqrt(D./(pi.*t)).*(C1-C0); <span class="comment">%drug flux into tissue over time</span>
+figure(3)
+plot(t , Nx); <span class="comment">%plot of flux vs. time</span>
+title(<span class="string">'Drug Flux vs. Time'</span>);
+xlabel(<span class="string">'Time, s'</span>);
+ylabel(<span class="string">'Flux, N (mol/cm^{2})'</span>);
+</pre><img vspace="5" hspace="5" src="BME307_HW7_P2_03.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%BME 307, HW7, P2, Part E
+%Mackenzie Marques
+%03/27/2018
+
+clear all
+close all
+%% Euler numerical methods  - plot drug concentration
+D = 2.33e-10; % diffusion coefficient calculated from Part c; units: cm^2/s
+x0 = 0; %initial position, x=0, units: cm
+xEnd = 0.004; %final position, x=L, units: cm
+t0 = 0; %initial time, t=0, units: s
+tEnd = 25*60; %final time, t=1500, units: s
+dt = 1; %time step size, units: s
+dx = (2.*D.*dt).^(0.5); %position step size, units: cm
+t = t0:dt:tEnd; %time vector
+x = x0:dx:xEnd; %position vector
+M = floor((tEnd-t0)./dt); %time nodes
+N = floor((xEnd-x0)./dx); %position nodes
+C = zeros(N+1,M+1); %pre-allocated concentration  matrix
+C(1,:) = 1e-9; %1st boundary condition: x=0,t>=0,C=1e-9
+%2nd boundary condition: x>>0,t>=0,C=0
+%initial condition: x>0,t=0,C=0
+%2nd boundary condition and initial condition already accounted for in
+%matrix of zeros
+for j = 1:M %iterate through time nodes (columns)
+    for i = 2:N %iterate through position nodes (rows)
+        C(i,j+1) = C(i,j) + ((D.*dt)./(dx.^2)).*(C(i+1,j)-2.*C(i,j)+C(i-1,j)); %numerical approximation of concentration from Fick's 2nd Law
+    end 
+end 
+%alternative approach to organizing position
+%position = zeros(N+1,M+1); 
+%for i = 1:N+1
+    %for j = 1:M+1
+        %position(i,j) = (i-1)*dx;
+    %end 
+%end
+figure(1)
+%plot of concentration vs. position
+%each line represents a time
+plot(x, C)
+title('Drug Concentration vs. Position, Time');
+xlabel('Distance into semi-infinite medium, x (cm)');
+ylabel('Concentration, C (mol/cm^{3})');
+figure(2)
+plot(x, C(:,5), 'k', x, C(:,20), 'k:', x, C(:, 500), 'kREPLACE_WITH_DASH_DASH', x, C(:,1000), 'k-.', x, C(:,1500), 'k*');
+legend('t = 5s', 't = 20s', 't = 500s', 't = 1000s', 't = 1500s');
+title('Drug Concentration vs. Position, Time');
+xlabel('Distance into semi-infinite medium, x (cm)');
+ylabel('Concentration, C (mol/cm^{3})');
+%% Plot of drug flux in tissue over time
+C1 = 1e-9; %drug concentration within lumen; units: mol/cm^3
+C0 = 0; %drug concentration at end of semi-infinite medium; units: mol/cm^3
+Nx = sqrt(D./(pi.*t)).*(C1-C0); %drug flux into tissue over time
+figure(3)
+plot(t , Nx); %plot of flux vs. time
+title('Drug Flux vs. Time');
+xlabel('Time, s');
+ylabel('Flux, N (mol/cm^{2})');
+##### SOURCE END #####
+--></body></html>
